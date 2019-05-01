@@ -1,21 +1,24 @@
 const content = () => {
 	const content = document.querySelector('.content');
 	const field = content.querySelector('.content__field');
+	const field_items = field.querySelectorAll('.content__field-item');
 	const btn = content.querySelector('.content__btn');
 	const stopwatch = content.querySelector('.content__timer');
 
 	let timerId = null;
 	let startDate = null;
+	let fieldGame = new Array(15); // игровое поле
+	let nodeArray = [];
 
 	const fieldColors = [ // множество оттенков
-		'#79553D',
-		'#FFDC33',
-		'#B00000',
-		'#A7FC00',
-		'#BD33A4',
-		'#240935',
-		'#42AAFF',
-		'#F34723'
+		'rgb(128, 0, 0)',
+		'rgb(255, 255, 0)',
+		'rgb(255, 0, 0)',
+		'rgb(0, 255, 0)',
+		'rgb(255, 0, 255)',
+		'rgb(128, 0, 128)',
+		'rgb(0, 0, 255)',
+		'rgb(255, 165, 0)'
 	];
 
 	const newField = listColors => { // генерирует новое поле с цветами в случайном порядке
@@ -45,13 +48,53 @@ const content = () => {
 		clearTimeout(timerId)
 	};
 
-
 	const onClickBtn = () => {
 		startDate = new Date();
-		startWatchFunc();
-		// stopWatchFunc(timerId);
+		startWatchFunc(); // запускаем таймер
+		fieldGame = newField(fieldColors); // создаем игровое поле
+	};
+
+	const onClickFieldItem = (node) => {
+		const index = Array.prototype.slice.call(field_items) // получаем индекс ноды которую нажали
+			.indexOf(node);
+
+		const lenNodeArray = nodeArray.length;
+		const lastNode = nodeArray[lenNodeArray - 1]; // последняя нода в массиве нод
+		const penultimateNode = nodeArray[lenNodeArray - 2]; // предпоследняя нода
+
+		if (lenNodeArray === 0) {
+			node.style.background = fieldGame[index];
+			nodeArray = nodeArray.concat(node);
+			return;
+		}
+
+		if (lastNode.style.background === fieldGame[index]) {
+			node.style.background = fieldGame[index];
+			nodeArray = nodeArray.concat(node);
+			return;
+		}
+
+		if (lastNode.style.background === penultimateNode.style.background) {
+			node.style.background = fieldGame[index];
+			nodeArray = nodeArray.concat(node);
+			if (lenNodeArray === 15) { // если массив нод полон, то стоп игра
+				stopWatchFunc(timerId);
+				alert('Вы выиграли!\r\nЗатраченное время: ' + stopwatch.textContent);
+				return;
+			}
+			return;
+		}
+
+		lastNode.style.background = 'rgb(255, 255, 255)';
+		nodeArray.pop();
+
 	};
 
 	btn.addEventListener('click', onClickBtn);
+
+	Array.prototype.forEach.call(field_items, node => {
+		node.addEventListener('click', onClickFieldItem.bind(null, node));
+	});
+
 };
 export { content };
