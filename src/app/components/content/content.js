@@ -21,12 +21,14 @@ const content = () => {
 		'rgb(255, 165, 0)'
 	];
 
-	const fieldInit = listColors => { // генерирует новое поле с цветами в случайном порядке
+	// генерирует новое поле с цветами в случайном порядке
+	const fieldInit = listColors => {
 		return listColors.slice()
 			.concat(listColors.slice())
 			.sort(() => Math.random() - 0.5);
 	};
 
+	// вычисляет разницу во времени между началом игры и текущим временем
 	const diffDate = startDate => { // вычисляет разницу во времени между началом игры и текущим временем
 		const currentDate = new Date();
 		const min = Math.floor((currentDate.getTime() - startDate.getTime()) / 60000);
@@ -37,18 +39,21 @@ const content = () => {
 		return minNormalized + ':' + secNormalized + ':' + milli;
 	};
 
-	const startWatchFunc = () => { // старт таймера
+	// старт таймера
+	const startWatchFunc = () => {
 		timerId = setTimeout(() => {
 			stopwatch.textContent = diffDate(startDate);
 			startWatchFunc();
 		}, 10);
 	};
 
-	const stopWatchFunc = timerId => { // остановить таймер
+	// остановить таймер
+	const stopWatchFunc = timerId => {
 		clearTimeout(timerId)
 	};
 
-	const onStartGame = () => { // старт игры
+	// старт игры
+	const onStartGame = () => {
 		Array.prototype.forEach.call(field_items, node => { // вешаем событие 'click' на элементы игрового поля
 			node.addEventListener('click', onGameSituation.bind(null, node));
 		});
@@ -58,7 +63,8 @@ const content = () => {
 		fieldGame = fieldInit(fieldColors); // создаем игровое поле
 	};
 
-	const onGameSituation = (node) => { // реакция на игровые ситуации
+	// реакция на игровые ситуации
+	const onGameSituation = (node) => {
 		const index = Array.prototype.slice.call(field_items) // получаем индекс ноды которую нажали
 			.indexOf(node);
 
@@ -66,6 +72,10 @@ const content = () => {
 		const lastNode = nodeArray[lenNodeArray - 1]; // последняя нода в массиве нод
 		const penultimateNode = nodeArray[lenNodeArray - 2]; // предпоследняя нода
 		const messEndGame = 'Вы выиграли!\r\nЗатраченное время: ';
+
+		if (nodeArray.includes(node)) { // защита от повторного нажатия на открытую клетку
+			return;
+		}
 
 		if (lenNodeArray === 0) { // если массив нод пуст, то
 			node.style.background = fieldGame[index]; // окрасить
@@ -103,7 +113,6 @@ const content = () => {
 
 		lastNode.style.background = 'rgb(255, 255, 255)'; // удалить последнюю ноду из массива
 		nodeArray.pop();
-
 	};
 
 	btn.addEventListener('click', onStartGame); // старт игры по нажатию кнопки
