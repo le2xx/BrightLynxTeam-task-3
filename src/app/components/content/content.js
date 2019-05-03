@@ -5,10 +5,10 @@ const content = () => {
 	const btn = content.querySelector('.content__btn');
 	const stopwatch = content.querySelector('.content__timer');
 
-	let timerId = null;
-	let startDate = null;
+	let timerId = null; // идентификатор таймера
+	let startDate = null; // время начала игры
 	let fieldGame = new Array(15); // игровое поле
-	let nodeArray = [];
+	let nodeArray = []; // массив нод, заполняется по ходу игры
 
 	const fieldColors = [ // множество оттенков
 		'rgb(128, 0, 0)',
@@ -21,7 +21,7 @@ const content = () => {
 		'rgb(255, 165, 0)'
 	];
 
-	const newField = listColors => { // генерирует новое поле с цветами в случайном порядке
+	const fieldInit = listColors => { // генерирует новое поле с цветами в случайном порядке
 		return listColors.slice()
 			.concat(listColors.slice())
 			.sort(() => Math.random() - 0.5);
@@ -37,7 +37,7 @@ const content = () => {
 		return minNormalized + ':' + secNormalized + ':' + milli;
 	};
 
-	const startWatchFunc = () => { // старт секундомера
+	const startWatchFunc = () => { // старт таймера
 		timerId = setTimeout(() => {
 			stopwatch.textContent = diffDate(startDate);
 			startWatchFunc();
@@ -48,53 +48,64 @@ const content = () => {
 		clearTimeout(timerId)
 	};
 
-	const onClickBtn = () => {
-		startDate = new Date();
+	const onStartGame = () => { // старт игры
+		Array.prototype.forEach.call(field_items, node => { // вешаем событие 'click' на элементы игрового поля
+			node.addEventListener('click', onGameSituation.bind(null, node));
+		});
+
+		startDate = new Date(); // фиксируем время начала игры
 		startWatchFunc(); // запускаем таймер
-		fieldGame = newField(fieldColors); // создаем игровое поле
+		fieldGame = fieldInit(fieldColors); // создаем игровое поле
 	};
 
-	const onClickFieldItem = (node) => {
+	const onGameSituation = (node) => { // реакция на игровые ситуации
 		const index = Array.prototype.slice.call(field_items) // получаем индекс ноды которую нажали
 			.indexOf(node);
 
 		const lenNodeArray = nodeArray.length;
 		const lastNode = nodeArray[lenNodeArray - 1]; // последняя нода в массиве нод
 		const penultimateNode = nodeArray[lenNodeArray - 2]; // предпоследняя нода
+		const messEndGame = 'Вы выиграли!\r\nЗатраченное время: ';
 
-		if (lenNodeArray === 0) {
-			node.style.background = fieldGame[index];
-			nodeArray = nodeArray.concat(node);
+		if (lenNodeArray === 0) { // если массив нод пуст, то
+			node.style.background = fieldGame[index]; // окрасить
+			nodeArray = nodeArray.concat(node); // и добавить в массив нод
 			return;
 		}
 
-		if (lastNode.style.background === fieldGame[index]) {
-			node.style.background = fieldGame[index];
-			nodeArray = nodeArray.concat(node);
+		if (lenNodeArray === 1 && lastNode.style.background !== fieldGame[index]) { // если есть хоть одна нода и не совпадает с текущей
+			lastNode.style.background = 'rgb(255, 255, 255)'; // окрасить в белый
+			nodeArray.pop(); // опустошить массив нод
 			return;
 		}
 
-		if (lastNode.style.background === penultimateNode.style.background) {
-			node.style.background = fieldGame[index];
-			nodeArray = nodeArray.concat(node);
+		if (lastNode.style.background === fieldGame[index]) { // если последняя нода в массиве нод совпадает с  текущей, то
+			node.style.background = fieldGame[index]; // окрасить
+			nodeArray = nodeArray.concat(node); // и добавить в массив нод
 			if (lenNodeArray === 15) { // если массив нод полон, то стоп игра
-				stopWatchFunc(timerId);
-				alert('Вы выиграли!\r\nЗатраченное время: ' + stopwatch.textContent);
+				stopWatchFunc(timerId); // остановить счетчик
+				setTimeout(() => alert( messEndGame + stopwatch.textContent), 300); // сообщить о победе
 				return;
 			}
 			return;
 		}
 
-		lastNode.style.background = 'rgb(255, 255, 255)';
+		if (lastNode.style.background === penultimateNode.style.background) { // если последняя и предпоследнии ноды одиноковы, то
+			node.style.background = fieldGame[index]; // окрасить
+			nodeArray = nodeArray.concat(node); // и добавить в массив нод
+			if (lenNodeArray === 15) { // если массив нод полон, то стоп игра
+				stopWatchFunc(timerId); // остановить счетчик
+				setTimeout(() => alert( messEndGame + stopwatch.textContent), 300); // сообщить о победе
+				return;
+			}
+			return;
+		}
+
+		lastNode.style.background = 'rgb(255, 255, 255)'; // удалить последнюю ноду из массива
 		nodeArray.pop();
 
 	};
 
-	btn.addEventListener('click', onClickBtn);
-
-	Array.prototype.forEach.call(field_items, node => {
-		node.addEventListener('click', onClickFieldItem.bind(null, node));
-	});
-
+	btn.addEventListener('click', onStartGame); // старт игры по нажатию кнопки
 };
 export { content };
