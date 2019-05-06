@@ -86,8 +86,19 @@ const content = () => {
     node.setAttribute('class', className);
   };
 
+  // общий сброс игры
+  const resetGame = () => {
+    Array.prototype.forEach.call(fieldItems, node =>
+      clearColorNode(node, 'content__field-item'));
+    timerId = null; // идентификатор таймера
+    startDate = null; // время начала игры
+    fieldGame = new Array(15); // игровое поле
+    nodeArray = []; // массив нод, заполняется по ходу игры
+  };
+
   // старт игры
   const onStartGame = () => {
+    resetGame();
     Array.prototype.forEach.call(fieldItems, node => { // вешаем событие 'click' на элементы игрового поля
       node.addEventListener('click', onGameSituation.bind(null, node));
     });
