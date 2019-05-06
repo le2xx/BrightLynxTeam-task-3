@@ -1,7 +1,7 @@
 const content = () => {
 	const content = document.querySelector('.content');
 	const field = content.querySelector('.content__field');
-	const field_items = field.querySelectorAll('.content__field-item');
+	const fieldItems = field.querySelectorAll('.content__field-item');
 	const btn = content.querySelector('.content__btn');
 	const stopwatch = content.querySelector('.content__timer');
 
@@ -10,15 +10,15 @@ const content = () => {
 	let fieldGame = new Array(15); // игровое поле
 	let nodeArray = []; // массив нод, заполняется по ходу игры
 
-	const fieldColors = [ // множество оттенков
-		'rgb(128, 0, 0)',
-		'rgb(255, 255, 0)',
-		'rgb(255, 0, 0)',
-		'rgb(0, 255, 0)',
-		'rgb(255, 0, 255)',
-		'rgb(128, 0, 128)',
-		'rgb(0, 0, 255)',
-		'rgb(255, 165, 0)'
+	const fieldColors = [ // // множество оттенков
+		'red',
+		'pink',
+		'orange',
+		'yellow',
+		'green',
+		'blue',
+		'sapphire',
+		'brown'
 	];
 
 	// генерирует новое поле с цветами в случайном порядке
@@ -54,7 +54,7 @@ const content = () => {
 
 	// старт игры
 	const onStartGame = () => {
-		Array.prototype.forEach.call(field_items, node => { // вешаем событие 'click' на элементы игрового поля
+		Array.prototype.forEach.call(fieldItems, node => { // вешаем событие 'click' на элементы игрового поля
 			node.addEventListener('click', onGameSituation.bind(null, node));
 		});
 
@@ -65,7 +65,7 @@ const content = () => {
 
 	// реакция на игровые ситуации
 	const onGameSituation = (node) => {
-		const index = Array.prototype.slice.call(field_items) // получаем индекс ноды которую нажали
+		const index = Array.prototype.slice.call(fieldItems) // получаем индекс ноды которую нажали
 			.indexOf(node);
 
 		const lenNodeArray = nodeArray.length;
